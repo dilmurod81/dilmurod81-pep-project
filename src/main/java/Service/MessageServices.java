@@ -20,7 +20,7 @@ public class MessageServices {
     public List<Message> getAllMessages(){
         return messageDAO.getAllMessages();
     }
-    public Message getMessageById(String m_id){
+    public Message getMessageById(int m_id){
         return messageDAO.getMessageById(m_id);
     }
     public Message updateMessage(int m_id, Message message){

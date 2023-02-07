@@ -104,10 +104,35 @@ public class SocialMediaController {
     private void getAllMessagesHandler(Context ctx) throws JsonProcessingException{
         List<Message> allMessages = messageServices.getAllMessages();
         if(allMessages.isEmpty()){
-            System.out.println("");
+            System.out.println();
             ctx.status(200);
         }else{
             ctx.json(allMessages);
+            ctx.status(200);
+        }
+    }
+    
+    private void getMessageByIdHandler(Context ctx) throws JsonProcessingException{
+        int m_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message message = messageServices.getMessageById(m_id);
+        if(message != null){
+            ctx.json(message);
+            ctx.status(200);
+        }else{
+            System.out.println("");
+            ctx.status(200);
+        }
+    }
+
+    private void deleteMessageHandler(Context ctx) throws JsonProcessingException{
+        int m_id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message toBeDeleted = messageServices.getMessageById(m_id);
+        if(toBeDeleted != null){
+            ctx.json(toBeDeleted);
+            messageServices.deleteMessage(m_id);            
+            ctx.status(200);
+        }else {
+            System.out.println("");
             ctx.status(200);
         }
     }
@@ -125,24 +150,7 @@ public class SocialMediaController {
         }
     }
 
-    private void getMessageByIdHandler(Context ctx) throws JsonProcessingException{
-        String m_id = ctx.pathParam("message_id");
-        Message message = messageServices.getMessageById(m_id);
-        ctx.json(message);
-        ctx.status(200);
-    }
 
-    private void deleteMessageHandler(Context ctx) throws JsonProcessingException{
-        int m_id = Integer.parseInt(ctx.pathParam("message_id"));
-        Message deleteMessage = messageServices.deleteMessage(m_id);
-        if(deleteMessage != null){
-            ctx.json(deleteMessage);
-            ctx.status(200);
-        }else {
-            System.out.println("");
-            ctx.status(200);
-        }
-    }
     private void getAllMessagesByAccountHandler(Context ctx) throws JsonProcessingException{
         int accountId = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> getMessagesByAccount = messageServices.getMessageByAccount(accountId);
