@@ -27,7 +27,7 @@ public class MessageServices {
         messageDAO.updateMessage(m_id, message);
         return null;
     }
-    public Message deleteMessage(String m_id){
+    public Message deleteMessage(int m_id){
         return messageDAO.deleteMessage(m_id);
     }
     public List<Message> getMessageByAccount(int accountId){

@@ -1,8 +1,10 @@
 package Service;
 
 import Model.Account;
-import DAO.AccountDAO;
+
 import java.util.List;
+
+import DAO.AccountDAO;
 
 public class AccountService {
     private AccountDAO accountDAO;
@@ -18,5 +20,9 @@ public class AccountService {
     public Account addAccount(Account account){
         accountDAO.addAccount(account);
         return null;
+    }
+    public Account getAccountById(int account){
+        Account a = accountDAO.getAccountById(account);
+        return a;
     }
 }
