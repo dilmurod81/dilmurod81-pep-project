@@ -1,7 +1,7 @@
-commit 0e09c5e36aac9f27e38875fc0299cf2b8c7eeeff
+commit 1a26d7babfc05d3c5a2bab320d06a3bfd13c420c
 Author: Dilmurod Berdiev <berdievdilmurod@gmail.com>
-Date:   Wed Feb 8 15:58:22 2023 +0000
+Date:   Wed Feb 8 20:03:13 2023 +0000
 
-    5 errors
+    ready almost
 
- 7 files changed, 333 insertions(+), 1309 deletions(-)
+ 3 files changed, 1257 insertions(+), 238 deletions(-)
