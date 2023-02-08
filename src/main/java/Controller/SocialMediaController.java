@@ -103,17 +103,17 @@ public class SocialMediaController {
         Message message = mapper.readValue(ctx.body(), Message.class);
         String match = "";  
         for(Account a : accountServices.getAllUsers()){
-            if(a.getAccount_id() != message.getPosted_by()){
-                match = "not matching";
+            if(a.getAccount_id() == message.getPosted_by()){
+                match = "matching";
             }
         }       
         if(message.message_text.length() == 0){
             ctx.status(400);
         } else if (message.message_text.length() > 255){
             ctx.status(400);        
-        } else if(match.equals("not matching")){
-            ctx.status(400);
-        } else {
+        } else if (match.equals("")){
+            ctx.status(400); 
+        }else if(match.equals("matching")){            
             Message addedMessage = messageServices.addMessage(message);
             ctx.json(mapper.writeValueAsString(addedMessage));
             ctx.status(200);
@@ -122,11 +122,11 @@ public class SocialMediaController {
 
     private void getAllMessagesHandler(Context ctx) throws JsonProcessingException{
         List<Message> allMessages = messageServices.getAllMessages();
-        if(allMessages.isEmpty()){
-            System.out.println();
+        if(allMessages != null){
+            ctx.json(allMessages);
             ctx.status(200);
         }else{
-            ctx.json(allMessages);
+            System.out.println("");
             ctx.status(200);
         }
     }
@@ -162,17 +162,17 @@ public class SocialMediaController {
         int m_id = Integer.parseInt(ctx.pathParam("message_id"));
         String match = "";         
         for(Message m : messageServices.getAllMessages()){
-            if(m.getMessage_id() != m_id){
-                match = "not exist";
-            }
+            if(m.getMessage_id() == m_id){
+                match = "exist";
+            }        
         }
         if(message.message_text.length() == 0){
             ctx.status(400);
         }else if(message.message_text.length() > 255){
             ctx.status(400);
-        }else if(match.equals("not exist")){
+        }else if(match.equals("")){
             ctx.status(400);
-        }else {
+        }else if(match.equals("exist")){
             ctx.status(200);
             messageServices.updateMessage(m_id, message);
             Message toBeUpdated = messageServices.getMessageById(m_id);
