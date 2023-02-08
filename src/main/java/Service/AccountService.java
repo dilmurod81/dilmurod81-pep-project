@@ -18,9 +18,13 @@ public class AccountService {
     }
 
     public Account addAccount(Account account){
-        accountDAO.addAccount(account);
-        return null;
+        return accountDAO.addAccount(account);    
     }
+    
+    public List<Account> getAllUsers(){
+        return accountDAO.getAllUsers();
+    }
+
     public Account getAccountById(int account){
         Account a = accountDAO.getAccountById(account);
         return a;

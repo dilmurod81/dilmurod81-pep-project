@@ -1,5 +1,6 @@
 package Controller;
 
+import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.Mockito.lenient;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class SocialMediaController {
     public SocialMediaController(){
         this.messageServices = new MessageServices();
         this.accountServices = new AccountService();
+        
     }
     
     /**
@@ -52,35 +54,44 @@ public class SocialMediaController {
     
     private void createNewAccountHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(ctx.body(), Account.class);        
-        // Account a = accountServices.addAccount(account);
-        // List<Account> aList = new ArrayList<>();
-        // aList.add(a);
-        // String match = "";
-        // for (Account ac : aList){
-        //     if (ac.getUsername().equals(account.username)){
-        //         match = "matching";
-        //     }else{
-        //         match = "not matching";
-        //     }
-        //  }
+        Account account = mapper.readValue(ctx.body(), Account.class);  
+        String match = "";         
+        for(Account a : accountServices.getAllUsers()){
+            if(a.getUsername().equals(account.username)){
+                match = "is matching";
+            }else{
+                match = "not matching";
+            }
+        }
         if(account.username.length() == 0){
             ctx.status(400);
         }else if(account.password.length() < 4){
             ctx.status(400);
-        // }else if(match.equals("not matching")){
-        //     ctx.status(400);
-        // }else{
-           }else{   Account addedAccount = accountServices.addAccount(account);
-            ctx.json(mapper.writeValueAsString(addedAccount));
-            ctx.status(200);
+        }else if(match.equals("is matching")){
+            ctx.status(400);
+        }else{   
+        Account acc = accountServices.addAccount(account);        
+        ctx.json(mapper.writeValueAsString(acc));
+        ctx.status(200);
         }
     }
     private void loginHandler(Context ctx) throws JsonProcessingException {        
         ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(ctx.body(), Account.class);
-        Account acc = accountServices.getAccountById(account.account_id);
-        if(account.username != null && account.username != account.getUsername()){
+        Account account = mapper.readValue(ctx.body(), Account.class);       
+        String match = "";
+        int acc_id = 0;         
+        for(Account a : accountServices.getAllUsers()){
+            if(a.getUsername().equals(account.username) && a.getPassword().equals(account.password)){
+                match = "is matching";
+            }
+        }
+        for(Account a : accountServices.getAllUsers()){
+            if(a.getUsername().equals(account.username)){
+                acc_id = a.getAccount_id();
+            }
+        }
+        if(match.equals("is matching")){
+            Account acc = accountServices.getAccountById(acc_id);
             ctx.json(mapper.writeValueAsString(acc));
             ctx.status(200);
         }else{
@@ -90,12 +101,20 @@ public class SocialMediaController {
     private void createMessageHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
+        String match = "";  
+        for(Account a : accountServices.getAllUsers()){
+            if(a.getAccount_id() != message.getPosted_by()){
+                match = "not matching";
+            }
+        }       
         if(message.message_text.length() == 0){
             ctx.status(400);
         } else if (message.message_text.length() > 255){
+            ctx.status(400);        
+        } else if(match.equals("not matching")){
             ctx.status(400);
         } else {
-            Message addedMessage = messageServices.addMessage(message); 
+            Message addedMessage = messageServices.addMessage(message);
             ctx.json(mapper.writeValueAsString(addedMessage));
             ctx.status(200);
         }
@@ -141,12 +160,23 @@ public class SocialMediaController {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(ctx.body(), Message.class);
         int m_id = Integer.parseInt(ctx.pathParam("message_id"));
-        Message updatedMessage = messageServices.updateMessage(m_id, message);
-        if(message.message_text == null && message.message_text.length() > 255 && message.message_id != message.getMessage_id()){
+        String match = "";         
+        for(Message m : messageServices.getAllMessages()){
+            if(m.getMessage_id() != m_id){
+                match = "not exist";
+            }
+        }
+        if(message.message_text.length() == 0){
             ctx.status(400);
-        }else{
-            ctx.json(mapper.writeValueAsString(updatedMessage));
+        }else if(message.message_text.length() > 255){
+            ctx.status(400);
+        }else if(match.equals("not exist")){
+            ctx.status(400);
+        }else {
             ctx.status(200);
+            messageServices.updateMessage(m_id, message);
+            Message toBeUpdated = messageServices.getMessageById(m_id);
+            ctx.json(toBeUpdated);
         }
     }
 
@@ -154,7 +184,12 @@ public class SocialMediaController {
     private void getAllMessagesByAccountHandler(Context ctx) throws JsonProcessingException{
         int accountId = Integer.parseInt(ctx.pathParam("account_id"));
         List<Message> getMessagesByAccount = messageServices.getMessageByAccount(accountId);
-        ctx.json(getMessagesByAccount);
-        ctx.status(200);
+        if(getMessagesByAccount != null){
+            ctx.json(getMessagesByAccount);
+            ctx.status(200);
+        }else{
+            System.out.println("");
+            ctx.status(200);
+        }
     }
 }
